@@ -37,22 +37,19 @@ def close_connection(exception):
 def init_db():
     with app.app_context():
         db = get_db()
-        db.execute('''CREATE TABLE IF NOT EXISTS users (
+        db.execute('DROP TABLE IF EXISTS users')
+        db.execute('''CREATE TABLE users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
             email TEXT NOT NULL UNIQUE
-        )''')  # Создаём таблицу users, если её нет
+        )''')
         db.commit()
-        # Проверяем, пуста ли таблица
-        cur = db.execute('SELECT COUNT(*) as cnt FROM users')
-        if cur.fetchone()['cnt'] == 0:
-            # Если пуста — добавляем тестовых пользователей
-            db.executemany('INSERT INTO users (name, email) VALUES (?, ?)', [
-                ('Alice', 'alice@example.com'),
-                ('Bob', 'bob@example.com'),
-                ('Charlie', 'charlie@example.com'),
-            ])
-            db.commit()
+        db.executemany('INSERT INTO users (name, email) VALUES (?, ?)', [
+            ('Alice', 'alice@example.com'),
+            ('Bob', 'bob@example.com'),
+            ('Charlie', 'charlie@example.com'),
+        ])
+        db.commit()
 
 # Маршрут для получения списка всех пользователей
 # Метод: GET /users
